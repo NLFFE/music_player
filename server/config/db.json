@@ -1,0 +1,7 @@
+{
+    "host": "ksudydatabase.cksgkkpwzyce.ap-northeast-2.rds.amazonaws.com",
+    "port": "3306",
+    "user": "ksudy",
+    "password": "Help7577",
+    "database": "ksudydatabase"
+}
