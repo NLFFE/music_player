@@ -42,10 +42,11 @@ class MusicUpdateTemplate extends Component {
 
         // 파일 업로드 할때 음악 파일이름을 dayhhmmss-name으로 수정하여 올려서 음악파일 이름을 짤라서 가져옴
         musicData = {
-            'musicFileName': musicData.music_url.split("-")[1],
+            'musicFileName': musicData.music_url,
             'musicName': musicData.music_name,
-            'imageName': musicData.image_url.split("-")[1],
+            'imageName': musicData.image_url,
             'musicId': musicId,
+
         }
 
         this.setState({
@@ -85,21 +86,26 @@ const MusicUpdateForm = ({ musicData,props }) => {
 
     //음악 수정하기 버튼을 눌렀을때 s3에 음악추가하고 데이터베이스에 음악데이터를 수정
     const onSubmit = async (data) => {
-        let imageUrlS3 = await group(data.imageFile[0]);
-        let musicUrlS3 = await group(data.musicFile[0]);
-        let musicUrl = musicUrlS3 && musicUrlS3.location
-        let imageUrl = imageUrlS3 && imageUrlS3.location
+        try {
 
-        const url = '/music/update';
-        const formData = new FormData();
-        formData.append('musicId', musicData.musicId);
-        formData.append('musicName', data.musicName);
-        formData.append('musicUrl', musicUrl);
-        formData.append('imageUrl', imageUrl);
-        post(url, formData).then((data) => {
-            props.history.push('/');
-            alert("정상적으로 수정됬습니다.")
-        });
+            let imageUrlS3 = await group(data.imageFile[0]);
+            let musicUrlS3 = await group(data.musicFile[0]);
+            let musicUrl = musicUrlS3 && musicUrlS3.location;
+            let imageUrl = imageUrlS3 && imageUrlS3.location;
+            const url = '/music/update';
+            const formData = new FormData();
+            formData.append('musicId', musicData.musicId);
+            formData.append('musicName', data.musicName);
+            formData.append('musicUrl', musicUrl);
+            formData.append('imageUrl', imageUrl);
+            post(url, formData).then((data) => {
+                props.history.push('/');
+                alert("정상적으로 수정됬습니다.")
+            });    
+        } catch (err) {
+            
+        }
+        
     }
 
     //음악 삭제 
@@ -125,7 +131,7 @@ const MusicUpdateForm = ({ musicData,props }) => {
                     <p>음악 선택</p>
                     <div className="filebox">
                         <label htmlFor="music">음악</label>
-                        <span className="input-label">{watch('musicFile') !== undefined && watch('musicFile')[0] !== undefined ? watch('musicFile')[0].name : `${musicData && musicData.musicFileName}`}</span>
+                        <span className="input-label">{watch('musicFile') !== undefined && watch('musicFile')[0] !== undefined ? watch('musicFile')[0].name : `${musicData && musicData.musicFileName.split("-")[1]}`}</span>
                         <input type="file" id="music" className="upload-hidden" name="musicFile" ref={register({
                             validate: value => MusicFileValidate(value) || '음악만 추가할 수 있습니다'
                         })} />
@@ -139,7 +145,7 @@ const MusicUpdateForm = ({ musicData,props }) => {
                     <p>이미지 선택</p>
                     <div className="filebox">
                         <label htmlFor="image">사진</label>
-                        <span className="input-label" >{watch('imageFile') !== undefined && watch('imageFile')[0] !== undefined ? watch('imageFile')[0].name : `${musicData && musicData.imageName}`}</span>
+                        <span className="input-label" >{watch('imageFile') !== undefined && watch('imageFile')[0] !== undefined ? watch('imageFile')[0].name : `${musicData && musicData.imageName.split("-")[1]}`}</span>
                         <input type="file" id="image" className="upload-hidden" name="imageFile" ref={register({
                             validate: value => ImageFileValidate(value) || '이미지만 추가할 수 있습니다'
                         })} />

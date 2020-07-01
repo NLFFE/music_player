@@ -95,7 +95,7 @@ class MainPageTemplate extends Component {
                     </div>
                     <input type="text" name="serch" value={this.state.serch} className="music-serch" placeholder="음악검색" onChange={this.onChange} onKeyPress={this.onChagneSerch} />
                     <div className="music-list">
-                        {this.state.filterMusics.length > 0 ? this.state.filterMusics.map(music => { return (<MusicItem onDoubleClick={this.musicDoubleClick}  key={music.music_id} msuic={music} />) }) : <h1>음악이 없습니다.</h1>}
+                        {this.state.filterMusics.length > 0 ? this.state.filterMusics.map(music => { return (<MusicItem onDoubleClick={this.musicDoubleClick}  key={music.music_id} music={music} />) }) : <h1>음악이 없습니다.</h1>}
 
                     </div>
                 </div>
