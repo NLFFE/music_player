@@ -29,11 +29,13 @@ const connection = mysql.createConnection({
 connection.connect();
 
 
+// 비밀번호 암호화 
+const bcrypt = require('bcrypt');
 
 
 //유저 로그인 
 router.post("/login", upload.none(), function(req, res){
-    let sql = 'select * from user where user_email = ? and user_password = ?';
+    let sql = 'select * from user where user_email = ?';
 
     // 유저 이메일
     let userEmail = req.body.userEmail;
@@ -41,9 +43,18 @@ router.post("/login", upload.none(), function(req, res){
     // 유저 패스워드
     let userPassword = req.body.userPassword;
 
-    parames = [userEmail, userPassword];
+    parames = [userEmail];
     connection.query(sql, parames, (err, rows, fields) => {
-        res.send(rows);
+
+      // 유저 이메일이 있을떄
+      if(rows.length > 0){
+        //패스워드 검사
+        let hashPassword = bcrypt.hashSync(userPassword, rows[0].user_salt);
+        if(hashPassword === rows[0].user_password){
+          res.send(rows)
+        }
+      }
+      res.send(200, {"result": false})
     });
 });
 
@@ -56,9 +67,12 @@ router.get("/logout", upload.none(), function(req, res){
 
 
 
+
 //유저 회원가입
-router.post('/join', upload.none(), (req, res) => {
-    let sql = 'INSERT INTO user(user_id, user_email, user_name, user_password) VALUES(null, ?, ?, ?)';
+router.post('/join', upload.none(),async(req, res) => {
+
+
+    let sql = 'INSERT INTO user(user_id, user_email, user_name, user_password, user_salt) VALUES(null, ?, ?, ?, ?)';
 
     //유저 이메일
     let userEmail = req.body.userEmail;
@@ -67,7 +81,11 @@ router.post('/join', upload.none(), (req, res) => {
     // 유저 패스워드
     let userPassword = req.body.userPassword;
 
-    let parames = [userEmail, userName, userPassword];
+    // 단반향 암호화 password
+    let userSalt = bcrypt.genSaltSync(10);
+    let hashPassword = bcrypt.hashSync(userPassword, userSalt);
+    
+    parames = [userEmail, userName, hashPassword, userSalt];
     connection.query(sql, parames, (err, rows, fields) => {
       res.send(rows);
     });

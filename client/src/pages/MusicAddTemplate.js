@@ -116,7 +116,7 @@ const MusicAddTemplate  = (props) => {
                     </ErrorMessage>
 
                     <p className="file-name">음악 이름</p>
-                    <input ref={register({required:'이름을 입력해주세요',pattern:namePattern, message:'한글 또는 영어만 입력할 수 있습니다 ex:(홍길동)'})} type="text" name="musicName" />
+                    <input ref={register({required:'이름을 입력해주세요', pattern:{value:namePattern, message:'한글 또는 영어만 입력할 수 있습니다 ex:(홍길동)'}})} type="text" name="musicName" />
 
                     {/* email Errors  */}
                     <ErrorMessage errors={errors} name="musicName">

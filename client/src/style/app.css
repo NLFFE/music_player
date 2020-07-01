@@ -202,7 +202,6 @@ input:focus {outline:none;}
 	padding: 10px;
 	border: 1px solid #e0e0e0;
 	margin-bottom:  24px;
-	cursor: pointer;
 }
 .info-group label{
 	
@@ -247,14 +246,7 @@ input:focus {outline:none;}
 	padding: 50px 50px;
 }
 
-.info-group input{
-	width: 80%;
-	height: 40px;
-	padding: 10px;
-	border: 1px solid #e0e0e0;
-	margin-bottom:  14px;
-	cursor: pointer;
-}
+
 .info-group p{
 	margin-bottom: 13px;
 	font-size: 14px;

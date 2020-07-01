@@ -14,8 +14,7 @@ const LoginPageTemplate = (props) => {
             formData.append('userEmail', data.userEmail);
             formData.append('userPassword', data.userPassword);
             let res = await post(url, formData);
-
-            if(res.data[0] === undefined){ // 비밀번호 틀렸을때
+            if(res.data.result === false){ // 비밀번호 틀렸을때
                 alert('아이디 또는 비밀번호가 다릅니다.')
                 props.history.push('/user/login');
                 return;
