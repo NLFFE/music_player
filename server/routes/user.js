@@ -33,7 +33,7 @@ connection.connect();
 
 //유저 로그인 
 router.post("/login", upload.none(), function(req, res){
-    let sql = 'select * from user where user_email = ? and user_password = password(?)';
+    let sql = 'select * from user where user_email = ? and user_password = ?';
 
     // 유저 이메일
     let userEmail = req.body.userEmail;
