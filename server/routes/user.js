@@ -34,7 +34,7 @@ const bcrypt = require('bcrypt');
 
 
 //유저 로그인 
-router.post("/login", upload.none(), function(req, res){
+router.post("/login", upload.none(),async function(req, res){
     let sql = 'select * from user where user_email = ?';
 
     // 유저 이메일
@@ -44,7 +44,7 @@ router.post("/login", upload.none(), function(req, res){
     let userPassword = req.body.userPassword;
 
     parames = [userEmail];
-    connection.query(sql, parames, (err, rows, fields) => {
+    await connection.query(sql, parames, (err, rows, fields) => {
 
       // 유저 이메일이 있을떄
       if(rows.length > 0){
@@ -54,7 +54,7 @@ router.post("/login", upload.none(), function(req, res){
           res.send(rows)
         }
       }
-      res.send(200, {"result": false})
+      res.end();
     });
 });
 

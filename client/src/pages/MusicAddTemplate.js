@@ -14,41 +14,41 @@ Date.prototype.hhmmss = function() {
 };
   
 const MusicAddTemplate  = (props) => {
-    const { register, handleSubmit, errors, watch } = useForm({ mode: 'onBlur',validateCriteriaMode: "all" });
+    const { register, handleSubmit, errors, watch } = useForm({validateCriteriaMode: "all" });
 
     //유효성검사 
     const MusicFileValidate = value => (value[0] !== undefined ? value[0].type === 'audio/mpeg' : false);
     const ImageFileValidate = value => (value[0] !== undefined ? (value[0].type.split('/')[0] === 'image') : false);
-    const namePattern = /^[a-zA-Z가-힣]+/g;
+    const namePattern = /^[a-zA-Z가-힣]+$/i;
 
 
     //음악 추가하기 버튼을 눌렀을때 s3에 음악추가하고 데이터베이스에 음악데이터 추가
-     const onSubmit = async(data) =>{
-
+     const onSubmit = async(data,e) =>{
         // 로그인 검사
         if(JSON.parse(localStorage.getItem('userData')) === null){
             alert("로그인후 사용가능합니다.");
             props.history.push('/login');
             return;
         }
+        let musicFile = data.musicFile[0];
+        let imageFile = data.imageFile[0];
+        let musicName = data.musicName;
+        
+        //음악 파일이름을 dayhhmmss-name으로 수정
+        Object.defineProperty(musicFile, 'name', {
+            writable: true,
+            value: (((new Date()).hhmmss())+"-"+musicFile.name).replace(/(\s*)/g,"")
+        });
 
+        //이미지 파일이름을 dayhhmmss-name으로 수정
+        Object.defineProperty(imageFile, 'name', {
+            writable: true,
+            value: (((new Date()).hhmmss())+"-"+imageFile.name).replace(/(\s*)/g,"")
+        });
+
+
+        //s3 파일 업로드, 뮤직데이터 데이터베이스에 저장
         try{
-            let musicFile = data.musicFile[0];
-            let imageFile = data.imageFile[0];
-            let musicName = data.musicName;
-
-            //음악 파일이름을 dayhhmmss-name으로 수정
-            Object.defineProperty(musicFile, 'name', {
-                writable: true,
-                value: (((new Date()).hhmmss())+"-"+musicFile.name).replace(/(\s*)/g,"")
-            });
-
-            //이미지 파일이름을 dayhhmmss-name으로 수정
-            Object.defineProperty(imageFile, 'name', {
-                writable: true,
-                value: (((new Date()).hhmmss())+"-"+imageFile.name).replace(/(\s*)/g,"")
-            });
-
             let imageFileS3 = await ReactS3.uploadFile(imageFile, config);
             let musicFileS3 = await ReactS3.uploadFile(musicFile, config);
 
@@ -86,14 +86,12 @@ const MusicAddTemplate  = (props) => {
             <div className="info-group"> 
                 <form className="filebox" onSubmit={handleSubmit(onSubmit)}>
                     <p>음악 선택</p>
-                    <div className="filebox">
-                        <label htmlFor="music">음악</label>
+                    <label htmlFor="music">음악</label>
                         <span className="input-label">{ watch('musicFile') !== undefined && watch('musicFile')[0] !== undefined ? watch('musicFile')[0].name : ''}</span>
                         <input type="file" id="music" className="upload-hidden" name="musicFile" ref={register({
                             required:'음악을 추가해주세요',
                             validate: value => MusicFileValidate(value) || '음악만 추가할 수 있습니다',
                         })}/>
-                    </div>
 
                     {/* music Errors  */}
                     <ErrorMessage errors={errors} name="musicFile">
@@ -101,15 +99,12 @@ const MusicAddTemplate  = (props) => {
                     </ErrorMessage>
 
                     <p>이미지 선택</p>
-                    <div className="filebox">
-                        <label htmlFor="image">사진</label>
+                    <label htmlFor="image">사진</label>
                         <span className="input-label">{ watch('imageFile') !== undefined && watch('imageFile')[0] !== undefined ? watch('imageFile')[0].name : ''}</span>
                         <input type="file" id="image" className="upload-hidden" name="imageFile" ref={register({
                             required:'이미지를 추가해주세요',
                             validate: value => ImageFileValidate(value) || '이미지만 추가할 수 있습니다',
                         })}/>
-                    </div>
-
                     {/* music Errors  */}
                     <ErrorMessage errors={errors} name="imageFile">
                         {({ message }) => <p style={{color:'#ef3b7d'}}>{message}</p>} 
